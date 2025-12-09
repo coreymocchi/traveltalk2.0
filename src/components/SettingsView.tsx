@@ -7,8 +7,8 @@ export default function SettingsView({ currentUser, onLogout, toggleTheme, isDar
   const changeColor = async (e:any) => { setColor(e.target.value); const u={...currentUser, theme:{...currentUser.theme, primaryColor:e.target.value}}; await dbPut('users',u); onUpdate(u); };
   
   return (
-    <div className="p-6 bg-bg h-full overflow-auto">
-       <h1 className="text-3xl font-bold dark:text-white mb-8">Settings</h1>
+    <div className="p-6 bg-white dark:bg-gray-900 h-full overflow-auto">
+       <h1 className="text-3xl font-bold dark:text-white mb-8 text-gray-900">Settings</h1>
        <div className="bg-surface border p-6 rounded-2xl mb-6">
            <h2 className="text-xl font-bold dark:text-white">{currentUser.name}</h2>
            <p className="text-gray-500">@{currentUser.username}</p>
