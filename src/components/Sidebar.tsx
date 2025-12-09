@@ -43,7 +43,7 @@ export default function Sidebar({ currentUser, currentChatId, onSelectChat, onOp
   };
 
   const del = async (e:any, id:string) => { e.stopPropagation(); if(confirm('Delete?')) await dbDelete('chats', id); load(); };
-  const toggleUser = (u: User) => setSelectedUsers(p => p.find(s=>s.id===u.id) ? p.filter(s=>s.id!==u.id) : [...p,u]);
+  const toggleUser = (u: User) => setSelected(p => p.find(s=>s.id===u.id) ? p.filter(s=>s.id!==u.id) : [...p,u]);
 
   return (
     <div className="flex flex-col h-full bg-surface border-r border-border">
