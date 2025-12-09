@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#588157">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>TravelTalk 3.0</title>
+  <link rel="manifest" href="/manifest.json">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: 'var(--primary)',
+            'primary-fg': 'var(--primary-fg)',
+            bg: 'var(--bg)',
+            surface: 'var(--surface)',
+            border: 'var(--border)',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
+  <style>
+    :root {
+      /* Default: Light Forest Green */
+      --primary: #588157; 
+      --primary-fg: #ffffff;
+      
+      /* Light Mode Grayscale */
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --border: #e9ecef;
+    }
+
+    .dark {
+      /* Dark Mode Grayscale */
+      --bg: #000000;
+      --surface: #121212;
+      --border: #27272a;
+    }
+
+    /* Custom scrollbar for webkit */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+    /* Leaflet Dark Mode Overrides */
+    .dark .leaflet-popup-content-wrapper,
+    .dark .leaflet-popup-tip {
+        background: #121212;
+        color: #f1f5f9;
+        border: 1px solid #333;
+    }
+    .dark .leaflet-container a.leaflet-popup-close-button {
+        color: #f1f5f9;
+    }
+    
+    /* Hide default routing machine container because we use our own UI */
+    .leaflet-routing-container {
+        display: none !important;
+    }
+
+    /* Ensure popups look good in dark mode */
+    .leaflet-popup-content {
+        margin: 0;
+        line-height: 1.5;
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
+    "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.1/client",
+    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.1",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/"
+  }
+}
+</script>
+</head>
+<body class="bg-bg text-gray-900 dark:text-gray-100 overflow-hidden h-screen w-screen transition-colors duration-200">
+  <div id="root" class="h-full w-full flex flex-col"></div>
+</body>
+</html>

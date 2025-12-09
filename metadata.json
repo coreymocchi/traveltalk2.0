@@ -1,0 +1,8 @@
+{
+  "name": "Copy of TravelTalk 3.0",
+  "description": "A hybrid travel companion app combining real-time chat, AI-powered translation, and interactive routing maps.",
+  "requestFramePermissions": [
+    "geolocation",
+    "microphone"
+  ]
+}
