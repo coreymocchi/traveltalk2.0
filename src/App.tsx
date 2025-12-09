@@ -14,33 +14,69 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mobileState, setMobileState] = useState(1);
   const [resize, setResize] = useState(0);
+  const [isDark, setIsDark] = useState(false);
 
-  useEffect(() => { const u = localStorage.getItem('tt_user'); if(u) dbGet('users', u).then(setUser); 
-    if(localStorage.getItem('theme')==='dark') document.documentElement.classList.add('dark');
+  useEffect(() => { 
+    const u = localStorage.getItem('tt_user'); 
+    if(u) dbGet('users', u).then(setUser); 
+    if(localStorage.getItem('theme')==='dark') {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    }
+    // Request permissions
+    if('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(() => {}, () => {});
+    }
+    if(navigator.mediaDevices?.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({audio: true}).then(s => s.getTracks().forEach(t => t.stop())).catch(() => {});
+    }
   }, []);
+  
   useEffect(() => { if(user?.theme?.primaryColor) document.documentElement.style.setProperty('--primary', user.theme.primaryColor); }, [user]);
   useEffect(() => { setTimeout(()=>setResize(r=>r+1), 300) }, [sidebarOpen, chatId, mobileState]);
 
   if(!user) return <Auth onLogin={(u: any)=>{setUser(u); localStorage.setItem('tt_user', u.username)}} />;
 
   return (
-    <div className="fixed inset-0 flex bg-bg text-gray-900 dark:text-gray-100 overflow-hidden">
-       <div className={`fixed inset-y-0 left-0 z-50 w-80 bg-surface shadow-xl transition-transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:relative'}`}>
+    <div className="fixed inset-0 flex bg-white dark:bg-black text-gray-900 dark:text-gray-100 overflow-hidden">
+       <div className={`fixed inset-y-0 left-0 z-50 w-80 bg-white dark:bg-gray-950 shadow-xl transition-transform border-r border-gray-200 dark:border-gray-800 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:relative'}`}>
            <Sidebar currentUser={user} currentChatId={chatId} onSelectChat={(id: string)=>{setChatId(id); setSidebarOpen(false); setMobileState(2);}} onOpenSettings={()=>{setSettingsOpen(true); setSidebarOpen(false);}} onClose={()=>setSidebarOpen(false)} />
        </div>
        <div className="flex-1 relative flex flex-col">
-           <div className="absolute top-4 left-4 z-20 md:hidden"><button onClick={()=>setSidebarOpen(true)} className="bg-surface/90 p-3 rounded-full shadow text-primary"><Menu/></button></div>
+           <div className="absolute top-4 left-4 z-20 md:hidden"><button onClick={()=>setSidebarOpen(true)} className="bg-white dark:bg-gray-800 p-3 rounded-full shadow text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"><Menu/></button></div>
            <div className="flex-1 relative"><MapView currentUser={user} resizeTrigger={resize} /></div>
            {chatId && (
                <>
-                 <div className="hidden md:block w-96 border-l bg-surface absolute right-0 top-0 bottom-0 z-30 shadow-xl"><ChatView chatId={chatId} currentUser={user} viewMode="desktop" onClose={()=>setChatId(null)} /></div>
+                 <div className="hidden md:block w-96 border-l bg-white dark:bg-gray-950 absolute right-0 top-0 bottom-0 z-30 shadow-xl border-l-gray-200 dark:border-l-gray-800"><ChatView chatId={chatId} currentUser={user} viewMode="desktop" onClose={()=>setChatId(null)} /></div>
                  <div className={`md:hidden fixed inset-x-0 bottom-0 z-40 transition-transform ${mobileState===1 ? '' : 'h-[60%]'}`}>
                      {mobileState===1 ? <div className="absolute bottom-4 left-4 right-4"><ChatView chatId={chatId} currentUser={user} viewMode="mobile-minimized" onMinimize={()=>setMobileState(2)} onClose={()=>setChatId(null)}/></div> : <div className="h-full"><ChatView chatId={chatId} currentUser={user} viewMode="mobile-expanded" onMinimize={()=>setMobileState(1)} onClose={()=>setChatId(null)}/></div>}
                  </div>
                </>
            )}
        </div>
-       {settingsOpen && <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4" onClick={(e)=>{if(e.target===e.currentTarget) setSettingsOpen(false);}}><div className="w-full max-w-lg max-h-[90vh] bg-white dark:bg-gray-950 rounded-3xl overflow-hidden relative border border-gray-200 dark:border-gray-800 shadow-2xl"><button onClick={()=>setSettingsOpen(false)} className="absolute top-4 right-4 p-2 bg-gray-200 dark:bg-gray-800 rounded-full z-10 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"><X size={20} className="text-gray-700 dark:text-gray-300"/></button><SettingsView currentUser={user} onLogout={()=>{setUser(null); localStorage.clear();}} isDark={document.documentElement.classList.contains('dark')} toggleTheme={()=>{document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark')?'dark':'light')}} onUpdate={setUser}/></div></div>}
+       {settingsOpen && (
+         <div className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={(e)=>{if(e.target===e.currentTarget) setSettingsOpen(false);}}>
+           <div className="w-full max-w-md bg-white dark:bg-gray-950 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
+             <div className="absolute top-4 right-4 z-10">
+               <button onClick={()=>setSettingsOpen(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors" title="Close settings"><X size={24} className="text-gray-600 dark:text-gray-300"/></button>
+             </div>
+             <div className="overflow-y-auto max-h-[90vh] pt-12 pb-6">
+               <SettingsView 
+                 currentUser={user} 
+                 onLogout={()=>{setUser(null); localStorage.clear();}} 
+                 isDark={isDark}
+                 toggleTheme={()=>{
+                   document.documentElement.classList.toggle('dark'); 
+                   const newDark = document.documentElement.classList.contains('dark');
+                   setIsDark(newDark);
+                   localStorage.setItem('theme', newDark?'dark':'light');
+                 }} 
+                 onUpdate={setUser}
+               />
+             </div>
+           </div>
+         </div>
+       )}
     </div>
   );
 }
