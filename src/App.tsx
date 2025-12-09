@@ -55,12 +55,19 @@ export default function App() {
            )}
        </div>
        {settingsOpen && (
-         <div className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={(e)=>{if(e.target===e.currentTarget) setSettingsOpen(false);}}>
-           <div className="w-full max-w-md bg-white dark:bg-gray-950 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
-             <div className="absolute top-4 right-4 z-10">
-               <button onClick={()=>setSettingsOpen(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors" title="Close settings"><X size={24} className="text-gray-600 dark:text-gray-300"/></button>
-             </div>
-             <div className="overflow-y-auto max-h-[90vh] pt-12 pb-6">
+         <div className="fixed inset-0 z-[999] bg-black/50 flex items-center justify-center p-4" onClick={(e)=>{if(e.target === e.currentTarget) setSettingsOpen(false);}}>
+           <div className="relative w-full max-w-md max-h-[90vh] bg-white dark:bg-gray-950 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-800 flex flex-col">
+             {/* Close Button */}
+             <button 
+               onClick={()=>setSettingsOpen(false)} 
+               className="absolute top-4 right-4 p-2 bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full z-10 transition-colors"
+               title="Close"
+             >
+               <X size={24} className="text-gray-700 dark:text-gray-300"/>
+             </button>
+             
+             {/* Content */}
+             <div className="overflow-y-auto flex-1">
                <SettingsView 
                  currentUser={user} 
                  onLogout={()=>{setUser(null); localStorage.clear();}} 

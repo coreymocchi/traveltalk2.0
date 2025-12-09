@@ -7,6 +7,7 @@ export default function MapView({ currentUser, onRoute, resizeTrigger }: any) {
   const userMarkerRef = useRef<any>(null);
   const [q, setQ] = useState('');
   const [res, setRes] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
   const [ref, setRef] = useState(0);
   const [gps, setGps] = useState(true);
   const [repMode, setRepMode] = useState<string|null>(null);
@@ -73,14 +74,27 @@ export default function MapView({ currentUser, onRoute, resizeTrigger }: any) {
       setRef(p=>p+1); setShowRep(false); setRepDesc('');
     };
 
-  const search = async () => { const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + q); setRes(await r.json()); };
+  const search = async () => { 
+    if(!q.trim()) return;
+    setSearching(true);
+    try {
+      const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(q)); 
+      const results = await r.json();
+      setRes(results);
+    } catch(err) {
+      console.error('Search error:', err);
+      setRes([]);
+    }
+    setSearching(false);
+  };
 
   return (
     <div className="absolute inset-0 bg-gray-100 dark:bg-gray-900">
       <div id="map" className="w-full h-full dark:bg-gray-800"></div>
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 w-80 z-[1000] bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3">
-         <div className="flex gap-2"><input className="flex-1 outline-none bg-transparent dark:text-white text-gray-900 placeholder-gray-500 dark:placeholder-gray-400" placeholder="Search..." value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==='Enter'&&search()}/><button onClick={search} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"><Search size={20} className="text-gray-600 dark:text-gray-300"/></button></div>
-         {res.length > 0 && <div className="max-h-48 overflow-y-auto border-t mt-2 bg-white dark:bg-gray-750 rounded-md mt-1" style={{backgroundColor: 'var(--bg)'}}>{res.map((r,i)=><div key={i} onClick={()=>{mapRef.current.setView([r.lat,r.lon],16); setRes([])}} className="p-3 border-b cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white text-sm transition-colors last:border-b-0">{r.display_name}</div>)}</div>}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 w-80 z-[1000] bg-white dark:bg-gray-800 rounded-xl shadow-lg p-3 border border-gray-200 dark:border-gray-700">
+         <div className="flex gap-2"><input className="flex-1 outline-none bg-transparent dark:text-white text-gray-900 placeholder-gray-500 dark:placeholder-gray-400" placeholder="Search locations..." value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==='Enter'&&search()}/><button onClick={search} disabled={searching} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors disabled:opacity-50"><Search size={20} className="text-gray-600 dark:text-gray-300"/></button></div>
+         {searching && <div className="text-center py-3 text-sm text-gray-500 dark:text-gray-400">Searching...</div>}
+         {res.length > 0 && <div className="max-h-48 overflow-y-auto border-t mt-2 bg-white dark:bg-gray-800 rounded-md" style={{backgroundColor: 'var(--bg)'}}>{res.map((r,i)=><div key={i} onClick={()=>{mapRef.current.setView([r.lat,r.lon],16); setRes([])}} className="p-3 border-b cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white text-sm transition-colors last:border-b-0">{r.display_name}</div>)}</div>}
       </div>
       <div className="absolute left-4 top-24 z-[900] flex flex-col gap-2">
          <button onClick={()=>startRep('accident')} className="bg-red-600 hover:bg-red-700 text-white p-2 rounded shadow font-bold text-xs transition-colors">💥 Accident</button>
