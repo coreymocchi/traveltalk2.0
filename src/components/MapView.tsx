@@ -23,9 +23,7 @@ export default function MapView({ currentUser, onRoute, resizeTrigger }: any) {
         m.getContainer().addEventListener('click', (e: any) => {
           if(e.target.classList.contains('tt-delete-marker')) {
             const id = e.target.getAttribute('data-id');
-            if(confirm('Delete marker?')) {
-              dbDelete('places', id).then(() => { setRef(p=>p+1); m.closePopup(); });
-            }
+            dbDelete('places', id).then(() => { setRef(p=>p+1); m.closePopup(); });
           }
         });
     }

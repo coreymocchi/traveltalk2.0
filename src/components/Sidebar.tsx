@@ -42,7 +42,7 @@ export default function Sidebar({ currentUser, currentChatId, onSelectChat, onOp
     setShowGroup(false); load(); onSelectChat(id);
   };
 
-  const del = async (e:any, id:string) => { e.stopPropagation(); if(confirm('Delete?')) await dbDelete('chats', id); load(); };
+  const del = async (e:any, id:string) => { e.stopPropagation(); await dbDelete('chats', id); load(); };
   const toggleUser = (u: User) => setSelected(p => p.find(s=>s.id===u.id) ? p.filter(s=>s.id!==u.id) : [...p,u]);
 
   return (
