@@ -15,11 +15,19 @@ export default function MapView({ currentUser, onRoute, resizeTrigger }: any) {
   const [repLoc, setRepLoc] = useState<any>(null);
 
   useEffect(() => {
-    window.travelTalkDeleteMarker = async (id) => { if(confirm('Delete marker?')) { await dbDelete('places', id); setRef(p=>p+1); mapRef.current?.closePopup(); } };
     if(!mapRef.current && window.L) {
         const m = window.L.map('map', {zoomControl: false}).setView([40.71, -74.00], 13);
         window.L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(m);
         mapRef.current = m;
+        // Attach global click handler for marker delete buttons
+        m.getContainer().addEventListener('click', (e: any) => {
+          if(e.target.classList.contains('tt-delete-marker')) {
+            const id = e.target.getAttribute('data-id');
+            if(confirm('Delete marker?')) {
+              dbDelete('places', id).then(() => { setRef(p=>p+1); m.closePopup(); });
+            }
+          }
+        });
     }
   }, []);
 
@@ -48,13 +56,8 @@ export default function MapView({ currentUser, onRoute, resizeTrigger }: any) {
              if(p.type==='police'){icon='👮';bg='blue'} else if(p.type==='accident'){icon='💥';bg='red'} else if(p.type==='camera'){icon='📷';bg='black'}
           const html = '<div style="background:' + bg + ';width:36px;height:36px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 3px 6px rgba(0,0,0,0.3)">' + icon + '</div>';
           const div = window.L.divIcon({ className: 'custom-div-icon', html });
-          const marker = window.L.marker([p.lat, p.lng], {icon: div}).addTo(m);
-          marker.on('popupopen', () => {
-            const btn = document.querySelector('[data-marker-' + p.id + ']');
-            if(btn) btn.addEventListener('click', async () => { if(confirm('Delete marker?')) { await dbDelete('places', p.id); setRef(r=>r+1); m.closePopup(); } });
-          });
-          const popup = '<b>' + p.title + '</b><br>' + p.description + '<br><button data-marker-' + p.id + ' style="background:red;color:white;width:100%;margin-top:5px;padding:5px;border-radius:4px;cursor:pointer">DELETE</button>';
-          marker.bindPopup(popup);
+          const popup = '<b>' + p.title + '</b><br>' + p.description + '<br><button class="tt-delete-marker" data-id="' + p.id + '" style="background:red;color:white;width:100%;margin-top:5px;padding:5px;border-radius:4px;cursor:pointer;border:none;font-weight:bold">DELETE</button>';
+          window.L.marker([p.lat, p.lng], {icon: div}).addTo(m).bindPopup(popup);
         });
     });
   }, [ref]);
