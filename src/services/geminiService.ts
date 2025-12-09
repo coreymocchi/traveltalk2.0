@@ -1,14 +1,12 @@
-const apiKey = import.meta.env.VITE_API_KEY || '';
-
 export async function translateText(text: string): Promise<string> {
-  if (!apiKey) return text;
   try {
-    // Use Google Cloud Translation v2 REST API (requires API key enabled for Cloud Translation)
-    const res = await fetch('https://translation.googleapis.com/language/translate/v2?key=' + encodeURIComponent(apiKey), {
+    // Call server-side translate endpoint which keeps the API key secret
+    const res = await fetch('/api/translate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ q: text, target: 'en', format: 'text' })
+      body: JSON.stringify({ text })
     });
+    if (!res.ok) return text;
     const data = await res.json();
     if (data && data.data && data.data.translations && data.data.translations[0] && data.data.translations[0].translatedText) {
       return data.data.translations[0].translatedText;
