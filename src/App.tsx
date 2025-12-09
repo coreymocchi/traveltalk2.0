@@ -26,7 +26,7 @@ export default function App() {
   return (
     <div className="fixed inset-0 flex bg-bg text-gray-900 dark:text-gray-100 overflow-hidden">
        <div className={`fixed inset-y-0 left-0 z-50 w-80 bg-surface shadow-xl transition-transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:relative'}`}>
-           <Sidebar currentUser={user} currentChatId={chatId} onSelectChat={(id: string)=>{setChatId(id); setSidebarOpen(false); setMobileState(2);}} onOpenSettings={()=>{setSidebarOpen(false); setSettingsOpen(true);}} onClose={()=>setSidebarOpen(false)} />
+           <Sidebar currentUser={user} currentChatId={chatId} onSelectChat={(id: string)=>{setChatId(id); setSidebarOpen(false); setMobileState(2);}} onOpenSettings={()=>{setSettingsOpen(true); setSidebarOpen(false);}} onClose={()=>setSidebarOpen(false)} />
        </div>
        <div className="flex-1 relative flex flex-col">
            <div className="absolute top-4 left-4 z-20 md:hidden"><button onClick={()=>setSidebarOpen(true)} className="bg-surface/90 p-3 rounded-full shadow text-primary"><Menu/></button></div>

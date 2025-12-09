@@ -48,8 +48,13 @@ export default function MapView({ currentUser, onRoute, resizeTrigger }: any) {
              if(p.type==='police'){icon='👮';bg='blue'} else if(p.type==='accident'){icon='💥';bg='red'} else if(p.type==='camera'){icon='📷';bg='black'}
           const html = '<div style="background:' + bg + ';width:36px;height:36px;border-radius:50%;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 3px 6px rgba(0,0,0,0.3)">' + icon + '</div>';
           const div = window.L.divIcon({ className: 'custom-div-icon', html });
-          const popup = '<b>' + p.title + '</b><br>' + p.description + '<br><button onclick="window.travelTalkDeleteMarker(\'' + p.id + '\')" style="background:red;color:white;width:100%;margin-top:5px;padding:5px;border-radius:4px">DELETE</button>';
-          window.L.marker([p.lat, p.lng], {icon: div}).addTo(m).bindPopup(popup);
+          const marker = window.L.marker([p.lat, p.lng], {icon: div}).addTo(m);
+          marker.on('popupopen', () => {
+            const btn = document.querySelector('[data-marker-' + p.id + ']');
+            if(btn) btn.addEventListener('click', async () => { if(confirm('Delete marker?')) { await dbDelete('places', p.id); setRef(r=>r+1); m.closePopup(); } });
+          });
+          const popup = '<b>' + p.title + '</b><br>' + p.description + '<br><button data-marker-' + p.id + ' style="background:red;color:white;width:100%;margin-top:5px;padding:5px;border-radius:4px;cursor:pointer">DELETE</button>';
+          marker.bindPopup(popup);
         });
     });
   }, [ref]);
